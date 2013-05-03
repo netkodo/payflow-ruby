@@ -2,7 +2,8 @@ require 'active_model'
 
 module Payflow
   class CreditCard
-    include ::ActiveModel::Validations
+    include ActiveModel::Validations
+    validates_with CreditCardValidator
 
     attr_accessor :number
     attr_accessor :month
@@ -16,9 +17,8 @@ module Payflow
       @number = options[:number]
       @month  = options[:month]
       @year   = options[:year]
-    end
-
-    def valid?
+      @first_name = options[:first_name]
+      @last_name  = options[:last_name]
     end
 
     def expiry_date
@@ -41,23 +41,5 @@ module Payflow
       number.to_s.length <= 4 ? number : number.to_s.slice(-4..-1)
     end
 
-    def validate_card_number
-      if number.blank?
-        errors.add :number, "is required"
-      elsif !CreditCard.valid_number?(number)
-        errors.add :number, "is not a valid credit card number"
-      end
-
-      unless errors.on(:number) || errors.on(:brand)
-        errors.add :brand, "does not match the card number" unless CreditCard.matching_brand?(number, brand)
-      end
-    end
-
-    def validate_card_brand #:nodoc:
-      errors.add :brand, "is required" if brand.blank? && number.present?
-      errors.add :brand, "is invalid"  unless brand.blank? || CreditCard.card_companies.keys.include?(brand)
-    end
-
-    alias_method :validate_card_type, :validate_card_brand
   end
 end
