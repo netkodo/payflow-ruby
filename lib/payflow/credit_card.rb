@@ -1,5 +1,8 @@
+require 'active_model'
+
 module Payflow
   class CreditCard
+    include ::ActiveModel::Validations
 
     attr_accessor :number
     attr_accessor :month
@@ -9,11 +12,21 @@ module Payflow
     attr_accessor :last_name
     attr_accessor :security_code
 
+    def initialize(options = {})
+      @number = options[:number]
+      @month  = options[:month]
+      @year   = options[:year]
+    end
+
     def valid?
     end
 
     def expiry_date
-      
+      ExpiryDate.new(@month, @year)
+    end
+
+    def expired?
+      expiry_date.expired?
     end
 
     def display_number
