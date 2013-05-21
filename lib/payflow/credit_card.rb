@@ -12,6 +12,7 @@ module Payflow
     attr_accessor :first_name
     attr_accessor :last_name
     attr_accessor :security_code
+    attr_accessor :encrypted_track_data
 
     def initialize(options = {})
       @number = options[:number]
@@ -27,6 +28,10 @@ module Payflow
 
     def expired?
       expiry_date.expired?
+    end
+
+    def encrypted?
+      encrypted_track_data.present?
     end
 
     def display_number

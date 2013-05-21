@@ -39,4 +39,20 @@ describe Payflow::CreditCard do
     )
     card.valid?.should be(false)
   end
+
+  it "should know if it does not have encrypted data" do
+    card = Payflow::CreditCard.new(
+        month: "1",
+        year: "2020",
+        number: "4111111111111111"
+      )
+    card.encrypted?.should be(false)
+  end
+
+  it "should know if it has encrypted data" do
+    card = Payflow::CreditCard.new(
+        encrypted_track_data: "sdgsdfgsfdgsdfgfdsgdsf"
+      )
+    card.encrypted?.should be(false)
+  end
 end
