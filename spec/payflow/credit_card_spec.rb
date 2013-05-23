@@ -53,6 +53,11 @@ describe Payflow::CreditCard do
     card = Payflow::CreditCard.new(
         encrypted_track_data: "sdgsdfgsfdgsdfgfdsgdsf"
       )
-    card.encrypted?.should be(false)
+    card.encrypted?.should be(true)
+  end
+
+  it "should automatically parse encrypted data" do
+    card = Payflow::CreditCard.new(encrypted_track_data: "sdgsdfgsfdgsdfgfdsgdsf")
+    card.enctrack2.should eql("2q52345")
   end
 end
