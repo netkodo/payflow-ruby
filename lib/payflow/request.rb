@@ -25,13 +25,19 @@ module Payflow
 
   XMLNS = 'http://www.paypal.com/XMLPay'
 
+
+  SWIPEDECRHOST       = "MAGT"
+  MAGTEKCARDTYPE      = 1
+  REGISTEREDBY        = "PayPal"
+  ENCRYPTIONBLOCKTYPE = 1
+
   class Request
     attr_accessor :xml
 
     TIMEOUT = 60
 
-    TEST_URL = 'https://pilot-payflowpro.paypal.com'
-    LIVE_URL = 'https://payflowpro.paypal.com'
+    TEST_HOST = 'pilot-payflowpro.paypal.com'
+    LIVE_HOST = 'payflowpro.paypal.com'
 
     def initialize(action, money, credit_card_or_reference, options = {})
       @options = options
@@ -178,10 +184,17 @@ module Payflow
     def commit(options = {})
       xml_body = build_request(xml)
 
+      puts "------- REQUEST ------------------"
+      puts xml_body
+      puts "-------------------------"
+
       response = connection.post do |request|
         request.headers["Content-Type"] = "text/xml"
+        request.headers["X-VPS-CLIENT-TIMEOUT"] = TIMEOUT.to_s
         request.headers["X-VPS-VIT-Integration-Product"] = "Payflow Gem"
         request.headers["X-VPS-VIT-Runtime-Version"] = RUBY_VERSION
+        request.headers["Host"] = test? ? TEST_HOST : LIVE_HOST
+        request.headers["X-VPS-REQUEST-ID"] = SecureRandom.base64(20)
         request.body = xml_body
       end
 
@@ -189,12 +202,12 @@ module Payflow
     end
 
     def test?
-      return true
+      return false
     end
 
     private
       def endpoint
-        test? ? TEST_URL : LIVE_URL
+        "https://#{test? ? TEST_HOST : LIVE_HOST}"
       end
 
       def connection
@@ -223,10 +236,15 @@ module Payflow
           xml.tag! 'NameOnCard', credit_card.first_name
 
           xml.tag! 'ExtData', 'Name' => 'LASTNAME', 'Value' =>  credit_card.last_name
-          xml.tag! 'ExtData', 'Name' => 'ENCTRACK2', 'Value' => credit_card.enctrack2
-          xml.tag! 'ExtData', 'Name' => 'ENCMP', 'Value' => credit_card.encmp
+          xml.tag! 'ExtData', 'Name' => 'ENCTRACK2', 'Value' => credit_card.track2
+          xml.tag! 'ExtData', 'Name' => 'ENCMP', 'Value' => credit_card.mp
           xml.tag! 'ExtData', 'Name' => 'KSN', 'Value' => credit_card.ksn
           xml.tag! 'ExtData', 'Name' => 'MPSTATUS', 'Value' => credit_card.mpstatus
+          xml.tag! 'ExtData', 'Name' => "DEVICESN", 'Value' => credit_card.device_sn
+          xml.tag! 'ExtData', 'Name' => "SWIPEDECRHOST", 'Value' => SWIPEDECRHOST
+          xml.tag! 'ExtData', 'Name' => "MAGTEKCARDTYPE", 'Value' => MAGTEKCARDTYPE
+          xml.tag! 'ExtData', 'Name' => "ENCRYPTIONBLOCKTYPE", 'Value' => ENCRYPTIONBLOCKTYPE
+          xml.tag! 'ExtData', 'Name' => "REGISTEREDBY", 'Value' => REGISTEREDBY
         end
       end
 

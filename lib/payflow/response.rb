@@ -1,8 +1,13 @@
+require 'nokogiri'
+
 module Payflow
   class Response
     attr_accessor :result
 
     def initialize(http_response)
+      puts "-----------------------"
+      puts http_response
+      puts "-----------------------"
       @http_response = http_response
       @result = parse(http_response)
     end

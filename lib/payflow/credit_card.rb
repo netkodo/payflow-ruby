@@ -14,16 +14,11 @@ module Payflow
     attr_accessor :security_code
     attr_accessor :encrypted_track_data
 
-    # used for the gateway most likely
-    attr_accessor :SWIPEDECRHOST
-    attr_accessor :MAGTEKCARDTYPE
-    attr_accessor :REGISTEREDBY
-    attr_accessor :ENCRYPTIONBLOCKTYPE
-
-    attr_accessor :enctrack2
-    attr_accessor :encmp
+    attr_accessor :track2
+    attr_accessor :mp
     attr_accessor :ksn
     attr_accessor :mpstatus
+    attr_accessor :device_sn
 
 
     def initialize(options = {})
@@ -33,6 +28,12 @@ module Payflow
       @first_name = options[:first_name]
       @last_name  = options[:last_name]
       @encrypted_track_data = options[:encrypted_track_data]
+
+      self.track2    = options[:track2]
+      self.mpstatus  = options[:mpstatus]
+      self.device_sn = options[:device_sn]
+      self.ksn       = options[:ksn]
+      self.mp        = options[:mp]
 
       parse_encryption if encrypted?
     end
@@ -46,6 +47,7 @@ module Payflow
     end
 
     def encrypted?
+      return true
       encrypted_track_data.present?
     end
 
@@ -63,12 +65,6 @@ module Payflow
 
     private
       def parse_encryption
-        self.enctrack2 = "2q52345"
-        self.ksn = "sadfgsdfgfd"
-        self.mpstatus = "ASDgfds"
-        self.encmp = "asdgfsd"
-        self.month = 11
-        self.year = 2020
       end
 
   end
