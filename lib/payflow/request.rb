@@ -1,3 +1,5 @@
+require 'faraday'
+
 module Payflow
 
   CARD_MAPPING = {
@@ -21,10 +23,18 @@ module Payflow
 
   DEFAULT_CURRENCY = "USD"
 
+  XMLNS = 'http://www.paypal.com/XMLPay'
+
   class Request
     attr_accessor :xml
 
+    TIMEOUT = 60
+
+    TEST_URL = 'https://pilot-payflowpro.paypal.com'
+    LIVE_URL = 'https://payflowpro.paypal.com'
+
     def initialize(action, money, credit_card_or_reference, options = {})
+      @options = options
       self.xml = case action
       when :sale, :authorize
         build_sale_or_authorization_request(action, money, credit_card_or_reference, options)
@@ -145,34 +155,6 @@ module Payflow
       "#{year}#{month}"
     end
 
-    def build_request(body, options = {})
-      xml = Builder::XmlMarkup.new
-      xml.instruct!
-      xml.tag! 'XMLPayRequest', 'Timeout' => timeout.to_s, 'version' => "2.1", "xmlns" => XMLNS do
-        xml.tag! 'RequestData' do
-          xml.tag! 'Vendor', @options[:login]
-          xml.tag! 'Partner', @options[:partner]
-          if options[:request_type] == :recurring
-            xml << body
-          else
-            xml.tag! 'Transactions' do
-              xml.tag! 'Transaction', 'CustRef' => options[:customer] do
-                xml.tag! 'Verbosity', 'MEDIUM'
-                xml << body
-              end
-            end
-          end
-        end
-        xml.tag! 'RequestAuth' do
-          xml.tag! 'UserPass' do
-            xml.tag! 'User', !@options[:user].blank? ? @options[:user] : @options[:login]
-            xml.tag! 'Password', @options[:password]
-          end
-        end
-      end
-      xml.target!
-    end
-
     def add_address(xml, tag, address, options)
       return if address.nil?
       xml.tag! tag do
@@ -193,7 +175,36 @@ module Payflow
       end
     end
 
+    def commit(options = {})
+      xml_body = build_request(xml)
+
+      response = connection.post do |request|
+        request.headers["Content-Type"] = "text/xml"
+        request.headers["X-VPS-VIT-Integration-Product"] = "Payflow Gem"
+        request.headers["X-VPS-VIT-Runtime-Version"] = RUBY_VERSION
+        request.body = xml_body
+      end
+
+      Payflow::Response.new(response)
+    end
+
+    def test?
+      return true
+    end
+
     private
+      def endpoint
+        test? ? TEST_URL : LIVE_URL
+      end
+
+      def connection
+        @conn ||= Faraday.new(:url => endpoint) do |faraday|
+          faraday.request  :url_encoded
+          faraday.response :logger
+          faraday.adapter  Faraday.default_adapter
+        end
+      end
+
       def add_keyed_credit_card(xml, credit_card)
         xml.tag! 'Card' do
           xml.tag! 'CardType', credit_card_type(credit_card)
@@ -217,6 +228,35 @@ module Payflow
           xml.tag! 'ExtData', 'Name' => 'KSN', 'Value' => credit_card.ksn
           xml.tag! 'ExtData', 'Name' => 'MPSTATUS', 'Value' => credit_card.mpstatus
         end
+      end
+
+      def build_request(body, options = {})
+        xml = Builder::XmlMarkup.new
+        xml.instruct!
+
+        xml.tag! 'XMLPayRequest', 'Timeout' => TIMEOUT.to_s, 'version' => "2.1", "xmlns" => XMLNS do
+          xml.tag! 'RequestData' do
+            xml.tag! 'Vendor', @options[:login]
+            xml.tag! 'Partner', @options[:partner]
+            if options[:request_type] == :recurring
+              xml << body
+            else
+              xml.tag! 'Transactions' do
+                xml.tag! 'Transaction', 'CustRef' => options[:customer] do
+                  xml.tag! 'Verbosity', 'MEDIUM'
+                  xml << body
+                end
+              end
+            end
+          end
+          xml.tag! 'RequestAuth' do
+            xml.tag! 'UserPass' do
+              xml.tag! 'User', !@options[:user].blank? ? @options[:user] : @options[:login]
+              xml.tag! 'Password', @options[:password]
+            end
+          end
+        end
+        xml.target!
       end
   end
 end

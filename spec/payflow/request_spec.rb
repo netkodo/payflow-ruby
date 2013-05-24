@@ -26,4 +26,28 @@ describe Payflow::Request do
       end
     end
   end
+
+  it "should be in test? if asked" do
+    request = Payflow::Request.new(:sale, 100, "CREDITCARDREF", {test: true})
+    request.test?.should be(true)
+  end
+
+  describe "commiting" do
+    it "should call connection post" do
+      request = Payflow::Request.new(:sale, 100, "CREDITCARDREF", {test: true})
+      connection = stub
+      connection.should_receive(:post).and_return(OpenStruct.new(status: 200, body: "<ResponseData><TransactionResult><AMount>12</AMount></TransactionResult></ResponseData>"))
+      request.stub(:connection).and_return(connection)
+      request.commit
+    end
+
+    it "should return a Payflow::Response" do
+      request = Payflow::Request.new(:sale, 100, "CREDITCARDREF", {test: true})
+      connection = stub
+      connection.should_receive(:post).and_return(OpenStruct.new(status: 200, body: "<ResponseData><TransactionResult><AMount>12</AMount></TransactionResult></ResponseData>"))
+      request.stub(:connection).and_return(connection)
+      request.commit.should be_a(Payflow::Response)
+    end
+  end
+
 end
