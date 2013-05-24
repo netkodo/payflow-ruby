@@ -8,8 +8,8 @@ Gem::Specification.new do |gem|
   gem.version       = Payflow::VERSION
   gem.authors       = ["Jonathan Spies", "Ben Bean"]
   gem.email         = ["jonathan.spies@gmail.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.description   = %q{A Ruby Library wrapper to the Payflow Gateway. This gem was created specifically to add magnetic card reader and decryption support not found in any other Payflow gems.}
+  gem.summary       = %q{Does Transactions against Payflow Gateway}
   gem.homepage      = ""
 
   gem.add_dependency "activemodel", "3.2.13"

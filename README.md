@@ -1,6 +1,6 @@
 # Payflow
 
-TODO: Write a gem description
+A Ruby Library wrapper to the Payflow Gateway. This gem was created specifically to add magnetic card reader and decryption support not found in any other Payflow gems.
 
 ## Installation
 
@@ -18,7 +18,9 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+credit_card = Payflow::CreditCard.new(encrypted_track_data: "XXXXXXXXXXXX")
+gateway = Payflow::Gateway.new(OpenStruct.new(login: "me", password: "credentials", partner: "PayPal"))
+response = gateway.sale(100, credit_card)
 
 ## Contributing
 
