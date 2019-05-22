@@ -142,7 +142,6 @@ module Payflow
           faraday.request  :url_encoded
           faraday.response :logger
           faraday.adapter  Faraday.default_adapter
-          faraday.use ZipkinTracer::FaradayHandler, 'payflow'
         end
       end
 
