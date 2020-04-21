@@ -1,3 +1,3 @@
-module Payflow
-  VERSION = "1.3.0"
+module Payflo
+  VERSION = "2.0.0"
 end
