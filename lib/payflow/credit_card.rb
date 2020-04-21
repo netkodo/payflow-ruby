@@ -22,6 +22,24 @@ module Payflow
     attr_accessor :mpstatus
     attr_accessor :device_sn
 
+    attr_accessor :billing_first_name
+    attr_accessor :billing_last_name
+    attr_accessor :billing_street
+    attr_accessor :billing_street2
+    attr_accessor :billing_city
+    attr_accessor :billing_state
+    attr_accessor :billing_zip
+    attr_accessor :billing_country
+
+    attr_accessor :shipping_first_name
+    attr_accessor :shipping_last_name
+    attr_accessor :shipping_street
+    attr_accessor :shipping_city
+    attr_accessor :shipping_state
+    attr_accessor :shipping_zip
+    attr_accessor :shipping_zip
+    attr_accessor :shipping_country
+
 
     def initialize(options = {})
       @number = options[:number]
@@ -29,6 +47,7 @@ module Payflow
       @year   = options[:year]
       @first_name = options[:first_name]
       @last_name  = options[:last_name]
+      @security_code = options[:security_code]
       @encrypted_track_data = options[:encrypted_track_data]
 
       self.track2    = options[:track2]
@@ -39,6 +58,25 @@ module Payflow
 
       parse_encryption if encrypted_string?
       set_brand(@number) if @number
+    end
+
+    def add_address(options = {})
+      @billing_first_name   = options[:billing_first_name]
+      @billing_last_name    = options[:billing_last_name]
+      @billing_street       = options[:billing_street]
+      @billing_street2      = options[:billing_street2]
+      @billing_city         = options[:billing_city]
+      @billing_state        = options[:billing_state]
+      @billing_zip          = options[:billing_zip]
+      @billing_country      = options[:billing_country]
+
+      @shipping_first_name  = options[:shipping_first_name]
+      @shipping_last_name   = options[:shipping_last_name]
+      @shipping_street      = options[:shipping_street]
+      @shipping_city        = options[:shipping_city]
+      @shipping_state       = options[:shipping_state]
+      @shipping_zip         = options[:shipping_zip]
+      @shipping_country     = options[:shipping_country]
     end
 
     def expiry_date

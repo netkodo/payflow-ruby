@@ -172,9 +172,27 @@ module Payflow
       end
 
       def add_keyed_credit_card!(credit_card)
-        pairs.acct    = credit_card.number
-        pairs.expdate = expdate(credit_card)
-        pairs.cvv2    = credit_card.security_code if credit_card.security_code.present?
+        pairs.acct            = credit_card.number
+        pairs.expdate         = expdate(credit_card)
+        pairs.cvv2            = credit_card.security_code if credit_card.security_code.present?
+
+        pairs.billtofirstname = credit_card.billing_first_name
+        pairs.billtolastname  = credit_card.billing_last_name
+        pairs.billtostreet    = credit_card.billing_street
+        pairs.billtostreet2   = credit_card.billing_street2
+        pairs.billtocity      = credit_card.billing_city
+        pairs.billtostate     = credit_card.billing_state
+        pairs.billtozip       = credit_card.billing_zip
+        pairs.billtocountry   = credit_card.billing_country
+
+        pairs.shiptofirstname = credit_card.shipping_first_name
+        pairs.shiptolastname  = credit_card.shipping_last_name
+        pairs.shiptostreet    = credit_card.shipping_street
+        pairs.shiptocity      = credit_card.shipping_city
+        pairs.shiptostate     = credit_card.shipping_state
+        pairs.shiptozip       = credit_card.shipping_zip
+        pairs.shiptocountry   = credit_card.shipping_country
+
 
         pairs
       end
