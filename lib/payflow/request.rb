@@ -193,6 +193,7 @@ module Payflow
         pairs.shiptozip       = credit_card.shipping_zip
         pairs.shiptocountry   = credit_card.shipping_country
 
+        pairs.comment1        = credit_card.order_id
 
         pairs
       end

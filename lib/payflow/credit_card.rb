@@ -40,6 +40,8 @@ module Payflow
     attr_accessor :shipping_zip
     attr_accessor :shipping_country
 
+    attr_accessor :order_id
+
 
     def initialize(options = {})
       @number = options[:number]
