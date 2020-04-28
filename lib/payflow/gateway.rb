@@ -2,20 +2,23 @@ module Payflow
 
   class Gateway
 
-    attr_accessor :login, :partner, :password
+    attr_accessor :login, :partner, :password, :user
 
     def self.new(merchant_account, options = {})
-      super if requires!(merchant_account, :login, :password, :partner)
+      super if requires!(merchant_account, :login, :password, :partner, :user)
     end
 
     def initialize(merchant_account, options = {})
       @login = merchant_account.login
       @partner = merchant_account.partner
       @password = merchant_account.password
+      @user = merchant_account.user
+
       @options = options.merge({
         login: login,
         password: password,
-        partner: partner
+        partner: partner,
+        user: user
       })
     end
 
