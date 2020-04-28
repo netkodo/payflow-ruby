@@ -16,7 +16,7 @@ module Payflow
     end
 
     def authorization_token
-      result[:pnref] || @result[:rpref]
+      @result[:rpref] || result[:pnref]
     end
 
     def paypal_transaction_id
